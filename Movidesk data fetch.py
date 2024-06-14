@@ -11,40 +11,81 @@ import json
 from colorama import Fore, Style
 
 def print_header():
-    header = """
-  ********     **     ****     ** ********** **********
- **//////     ****   /**/**   /**/////**/// /////**/// 
-/**          **//**  /**//**  /**    /**        /**    
-/*********  **  //** /** //** /**    /**        /**    
-////////** **********/**  //**/**    /**        /**    
-       /**/**//////**/**   //****    /**        /**    
- ******** /**     /**/**    //***    /**        /**    
-////////  //      // //      ///     //         //     
+    header = """       
+                ███████ ███████    ███████  █████  ███    ██ ████████ ████████                     
+                ██      ██         ██      ██   ██ ████   ██    ██       ██                        
+█████ █████     █████   █████      ███████ ███████ ██ ██  ██    ██       ██        █████ █████     
+                ██      ██              ██ ██   ██ ██  ██ ██    ██       ██                        
+                ██      ███████ ██ ███████ ██   ██ ██   ████    ██       ██  
     """
     print(Fore.GREEN + header + Style.RESET_ALL)
-    print("Moviget CW -- coded by Santt.")
-    print("GITHUB.COM/FESANTT")
+    print("Moviget CW -- coded by FeSantt. GITHUB.COM/FESANTT")
+    print("---------------------------------------------------")
+    print("https://github.com/Fesantt/Movidesk-data-fetch")
+    print("---------------------------------------------------")
+    print(" ")
 
 # Chame a função para exibir o cabeçalho e os textos
 print_header()
 
-# Coletando Inputs do Usuario 
 def get_user_input():
-    access_token = input("Digite o Access Token da API Movidesk: ")
-    start_date = input("Digite a data de início (formato YYYY-MM-DD): ")
-    end_date = input("Digite a data de término (formato YYYY-MM-DD): ")
-    ranges = int(input("Digite a quantidade de requisições (cada requisição retorna no máximo 1000 itens): "))
-    increment_option = input("Deseja incrementar os dados em uma tabela existente? (sim/não): ").strip().lower()
+    while True:
+        access_token = input("Digite o Access Token da API Movidesk: ")
+        if not access_token:
+            print(Fore.RED + "O Access Token não pode ser vazio. Por favor, digite um valor válido." + Style.RESET_ALL)
+            continue
+        else:
+            break
+
+    while True:
+        start_date = input("Digite a data de início (formato YYYY-MM-DD): ")
+        end_date = input("Digite a data de término (formato YYYY-MM-DD): ")
+        date_pattern = r"^\d{4}-\d{2}-\d{2}$"
+        if not re.match(date_pattern, start_date) or not re.match(date_pattern, end_date):
+            print(Fore.RED + "Formato de data inválido. Use o formato YYYY-MM-DD." + Style.RESET_ALL)
+            continue
+        else:
+            break
+
+    while True:
+        try:
+            ranges = int(input("Digite a quantidade de requisições (cada requisição retorna no máximo 1000 itens): "))
+            if ranges <= 0:
+                print(Fore.RED + "Por favor, digite um número positivo para a quantidade de requisições." + Style.RESET_ALL)
+                continue
+            else:
+                break
+        except ValueError:
+            print(Fore.RED + "Por favor, digite um número inteiro para a quantidade de requisições." + Style.RESET_ALL)
+
+    while True:
+        increment_option = input("Deseja incrementar os dados em uma tabela existente? (sim/não): ").strip().lower()
+        if increment_option not in ["sim", "não"]:
+            print(Fore.RED + "Por favor, digite 'sim' ou 'não' para a opção de incremento." + Style.RESET_ALL)
+            continue
+        else:
+            break
+
     if increment_option == "sim":
-        existing_file_name = input("Digite o nome do arquivo Excel existente (com extensão .xlsx): ")
-        new_file_name = existing_file_name
+        while True:
+            existing_file_name = input("Digite o nome do arquivo Excel existente (com extensão .xlsx): ")
+            if not existing_file_name.endswith(".xlsx"):
+                print(Fore.RED + "O arquivo deve ter a extensão .xlsx." + Style.RESET_ALL)
+                continue
+            else:
+                new_file_name = existing_file_name
+                break
     else:
-        new_file_name = input("Digite o nome do novo arquivo Excel (sem espaços e sem caracteres especiais): ")
-        if not new_file_name.endswith(".xlsx"):
-            new_file_name += ".xlsx"
-        existing_file_name = None
+        while True:
+            new_file_name = input("Digite o nome do novo arquivo Excel (sem espaços e sem caracteres especiais): ")
+            if not new_file_name.endswith(".xlsx"):
+                new_file_name += ".xlsx"
+            existing_file_name = None
+            break
+        
     return start_date, end_date, ranges, new_file_name, access_token, increment_option, existing_file_name
 
+# Chamada da função e armazenamento dos resultados
 start_date, end_date, ranges, new_file_name, access_token, increment_option, existing_file_name = get_user_input()
 
 
@@ -170,8 +211,8 @@ def extract_message_times(actions):
     return welcome_time, last_message_time
 
 df[['welcome_message_time', 'last_message_time']] = df['actions'].apply(lambda x: pd.Series(extract_message_times(x)))
-df['welcome_message_time'] = pd.to_datetime(df['welcome_message_time'])
-df['last_message_time'] = pd.to_datetime(df['last_message_time'])
+df['welcome_message_time'] = pd.to_datetime(df['welcome_message_time'], format='%d/%m/%Y %H:%M')
+df['last_message_time'] = pd.to_datetime(df['last_message_time'], format='%d/%m/%Y %H:%M')
 
 df.drop('actions', axis=1, inplace=True)
 
@@ -233,6 +274,6 @@ if increment_option == 'sim':
 df.to_excel(new_file_name, index=False)
 
 # Se chegou aqui deu tudo Certo :)
-print(f"Tarefa concluída, dados salvos no arquivo {new_file_name}")
+print(Fore.GREEN + f"Tarefa concluída, dados salvos no arquivo {new_file_name}" + Style.RESET_ALL)
 
 pause = input("Pressione ENTER para sair...")
