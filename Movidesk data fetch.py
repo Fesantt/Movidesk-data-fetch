@@ -94,7 +94,7 @@ start_date = f"{start_date}T00:00:00.00z"
 end_date = f"{end_date}T23:59:59.00z"
 date_filter = f"createdDate ge {start_date} and createdDate le {end_date}"
 
-base_url = "https://cardapioweb.movidesk.com/public/v1/tickets/past"
+base_url = "https://{seu_subdominio}.movidesk.com/public/v1/tickets/past"
 headers = {
     "Authorization": f"Bearer {access_token}",
     "Content-Type": "application/json"
