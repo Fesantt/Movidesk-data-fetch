@@ -25,7 +25,6 @@ def print_header():
     print("---------------------------------------------------")
     print(" ")
 
-# Chame a função para exibir o cabeçalho e os textos
 print_header()
 
 def get_user_input():
